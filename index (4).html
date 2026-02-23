@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
+<title>The United Patgram Hatibandha</title>
+<style>
+:root{--primary:#1e3a8a;--bg:#f1f5f9;--card:#ffffff;--edit:#059669;--danger:#dc2626;--gray:#64748b;--accent:#3b82f6}
+body{margin:0;font-family:system-ui,Arial;background:var(--bg);padding-bottom:100px;min-height:100vh}
+header{background:var(--primary);color:#fff;padding:15px;text-align:center;font-weight:700;font-size:18px;letter-spacing:1px}
+.container{padding:12px; max-width: 1200px; margin: auto;}
+.card{background:var(--card);border-radius:12px;padding:15px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);border:1px solid #e2e8f0}
+h3{margin:10px 0;font-size:16px;color:var(--primary);border-bottom:2px solid var(--primary);padding-bottom:5px;display:inline-block}
+input,select,button{width:100%;padding:12px;margin-top:10px;border-radius:8px;border:1px solid #cbd5e1;box-sizing:border-box;font-size:14px}
+button{background:var(--primary);color:#fff;border:none;font-weight:600;cursor:pointer;transition:0.3s}
+button:active{transform:scale(0.98)}
+.hidden{display:none}
+nav{display:flex;position:fixed;bottom:0;width:100%;background:#fff;padding:10px;box-shadow:0 -2px 10px rgba(0,0,0,.1);box-sizing:border-box;gap:5px;z-index:1000}
+nav button{flex:1;margin-top:0;font-size:10px;padding:10px 2px; font-weight: bold; background:#f8fafc; color:var(--primary); border:1px solid #e2e8f0}
+.table-responsive{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:11px;background:#fff;margin-top:10px}
+th,td{border:1px solid #cbd5e1;padding:8px;text-align:center}
+th{background:#f1f5f9;color:var(--primary);font-weight:bold}
+.p-thumb { width: 35px; height: 35px; border-radius: 50%; object-fit: cover; border: 1px solid #ddd; }
+.p-large { width: 90px; height: 90px; border-radius: 50%; object-fit: cover; border: 3px solid var(--primary); display: block; margin: 0 auto 10px; }
+.name-link { color: var(--accent); font-weight: bold; cursor: pointer; text-decoration: underline; }
+.del-btn { background: var(--danger); color: white; padding: 4px 8px; border-radius: 4px; border: none; font-size:10px}
+.grand-total { background: #1e293b !important; color: #fff !important; font-weight: bold; }
+#modalOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); display: none; align-items: center; justify-content: center; z-index: 2000; padding:20px}
+.modal-content { background: #fff; padding: 20px; border-radius: 15px; width: 100%; max-width: 320px; text-align: center; position: relative; }
+.close-modal { position: absolute; top: 10px; right: 15px; font-size: 24px; cursor: pointer; }
+
+/* প্রিন্ট সেকশন */
+.print-header, .print-footer { display: none; text-align: center; width: 100%; }
+.print-header h1 { font-size: 24px; margin: 0; color: #000; }
+.print-header p { font-size: 14px; margin: 5px 0 10px; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 5px; }
+.print-footer p { font-size: 12px; margin-top: 20px; color: #333; }
+
+@media print {
+    nav, header, .no-print, input, select, button, h3, .print-btn { display: none !important; }
+    .print-header, .print-footer { display: block !important; }
+    .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
+    table { font-size: 12px !important; width: 100% !important; border: 1px solid #000 !important; }
+    th, td { border: 1px solid #000 !important; padding: 6px !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="print-header"><h1>The United Patgram Hatibandha</h1><p id="printSubTitle"></p></div>
+<header class="no-print">The United Patgram Hatibandha</header>
+
+<div class="container">
+    <div id="loginCard" class="card">
+        <h3>লগইন করুন</h3>
+        <input id="loginId" placeholder="আইডি"/><input id="loginPass" type="password" placeholder="পাসওয়ার্ড"/>
+        <button onclick="login()">প্রবেশ করুন</button>
+    </div>
+
+    <div id="dashboard" class="hidden">
+        <div id="memberSection" class="section hidden">
+            <div id="adminAddForm" class="card hidden">
+                <h3>নতুন সদস্য যুক্ত করুন</h3>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+                    <input id="mId" placeholder="আইডি" readonly style="background:#f1f5f9"/>
+                    <input id="mName" placeholder="নাম"/>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px">
+                    <input id="mMobile" placeholder="মোবাইল"/>
+                    <input id="mPassword" placeholder="পাসওয়ার্ড"/>
+                </div>
+                <input id="mAddress" placeholder="ঠিকানা"/><input type="file" id="mPhoto" accept="image/*"/>
+                <button onclick="addMember()" style="background:var(--edit)">সদস্য সেভ করুন</button>
+            </div>
+            <div class="card">
+                <h3>সদস্য তালিকা</h3>
+                <div id="memberList" class="table-responsive"></div>
+                <button class="print-btn no-print" onclick="preparePrint('Member List'); window.print()" style="background:#475569; margin-top:10px">প্রিন্ট তালিকা</button>
+            </div>
+        </div>
+
+        <div id="entrySection" class="section hidden">
+            <div class="card">
+                <h3>লেনদেন এন্ট্রি</h3>
+                <select id="entryMemberSelect"></select>
+                <select id="category"><option>Deposit</option><option>Form Fee</option><option>Fine</option><option>Others</option></select>
+                <input id="amount" type="number" placeholder="টাকার পরিমাণ"/>
+                <select id="monthSelect"></select>
+                <select id="fySelect"><option>2024-2025</option><option>2025-2026</option><option>2026-2027</option></select>
+                <button onclick="addTransaction()">ডাটা সেভ করুন</button>
+            </div>
+        </div>
+
+        <div id="reportSection" class="section hidden">
+            <div class="card">
+                <h3>রিপোর্ট ফিল্টার</h3>
+                <div id="adminReportFilters" class="hidden">
+                    <select id="reportMemberFilter" onchange="updateReportSubFilter()">
+                        <option value="single">Member (একক মেম্বার)</option>
+                        <option value="all_members">All Members (সব মেম্বার)</option>
+                        <option value="others_only">Others (শুধু আদার্স)</option>
+                        <option value="all_with_others">All Members + Others (সবাই একসাথে)</option>
+                    </select>
+                    <select id="reportSingleMember"></select>
+                </div>
+                <select id="reportType" onchange="toggleFilters()"><option value="month">Monthly</option><option value="year">Yearly</option><option value="summary">Summary</option></select>
+                <select id="repMonth"></select>
+                <select id="repYear"><option>2024-2025</option><option>2025-2026</option><option>2026-2027</option></select>
+                <button onclick="generateReport()">রিপোর্ট দেখুন</button>
+            </div>
+            <div id="reportArea" class="card hidden">
+                <div id="reportOutput" class="table-responsive"></div>
+                <button class="print-btn no-print" onclick="preparePrint('Report'); window.print()" style="background:#475569; margin-top:10px">রিপোর্ট প্রিন্ট করুন</button>
+            </div>
+        </div>
+
+        <div id="historySection" class="section hidden">
+            <div class="card"><h3>লেনদেন হিস্টোরি</h3><div id="historyList" class="table-responsive"></div></div>
+        </div>
+
+        <div id="editSection" class="section hidden">
+            <div class="card" style="text-align:center">
+                <h3 id="idLabel">সম্পাদনা</h3>
+                <input id="edId" placeholder="আইডি"/><input id="edName" placeholder="নাম"/><input id="edMobile" placeholder="মোবাইল"/><input id="edAddress" placeholder="ঠিকানা"/><input id="edPass" placeholder="পাসওয়ার্ড"/>
+                <input type="file" id="edPhoto" accept="image/*"/>
+                <button onclick="saveEdit()" style="background:var(--edit)">আপডেট করুন</button>
+                <button onclick="show('member')" style="background:var(--gray); margin-top:5px">বাতিল</button>
+            </div>
+        </div>
+    </div>
+    <div class="print-footer"><p>Created By Sarkar</p></div>
+</div>
+
+<div id="modalOverlay"><div class="modal-content"><span class="close-modal" onclick="closeModal()">&times;</span><div id="profileDetails"></div><div id="modalActions"></div></div></div>
+
+<nav id="navbar" class="no-print hidden">
+    <button onclick="show('member')">সদস্যবৃন্দ</button>
+    <button class="adm-only" onclick="show('entry')">এন্ট্রি</button>
+    <button class="adm-only" onclick="show('history')">হিস্টোরি</button>
+    <button onclick="show('report')">রিপোর্ট</button>
+    <button onclick="viewProfile('admin')" style="background:var(--primary); color:#fff">Admin</button>
+    <button onclick="openEditMode('self')" style="background:#eab308; color:#fff">আমার প্রোফাইল</button>
+    <button onclick="location.reload()" style="background:var(--danger); color:#fff">আউট</button>
+</nav>
+
+<script>
+// --- সংশোধিত ডাটা লোডিং সিস্টেম ---
+let members = JSON.parse(localStorage.getItem('members')) || [];
+let txns = JSON.parse(localStorage.getItem('txn')) || [];
+let adminData = JSON.parse(localStorage.getItem('adminData')) || {id:'admin', name:'Super Admin', mobile:'017XXXXXXXX', address:'Hatibandha', password:'4453', photo:''};
+
+// যদি মেম্বার লিস্ট খালি থাকে, তবেই ২ জন প্রাথমিক মেম্বার যুক্ত হবে (শুধুমাত্র প্রথমবার)
+if (members.length === 0) {
+    members = [
+        {id:'01', name:'Member 1', mobile:'017...', password:'123', address:'Hatibandha', photo:''},
+        {id:'02', name:'Member 2', mobile:'018...', password:'123', address:'Patgram', photo:''}
+    ];
+    localStorage.setItem('members', JSON.stringify(members));
+}
+
+let currentUser = null;
+const months = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+function login() {
+    const id = loginId.value.trim(), pass = loginPass.value.trim();
+    if(id===adminData.id && pass===adminData.password) currentUser = {...adminData, isAdmin:true};
+    else { 
+        let m = members.find(x=>x.id===id && x.password===pass); 
+        if(m) currentUser = {...m, isAdmin:false}; 
+    }
+    if(!currentUser) return alert("ভুল আইডি/পাসওয়ার্ড!");
+    
+    loginCard.classList.add('hidden'); 
+    dashboard.classList.remove('hidden'); 
+    navbar.classList.remove('hidden');
+    
+    if(!currentUser.isAdmin) { 
+        document.querySelectorAll('.adm-only').forEach(e=>e.classList.add('hidden')); 
+        adminAddForm.classList.add('hidden'); 
+        adminReportFilters.classList.add('hidden'); 
+    } else { 
+        adminAddForm.classList.remove('hidden'); 
+        adminReportFilters.classList.remove('hidden'); 
+    }
+    initApp(); 
+    show('member');
+}
+
+function initApp() {
+    updateDropdowns();
+    generateNextId();
+}
+
+function updateDropdowns() {
+    let mOpts = members.map(m=>`<option value="${m.id}">${m.name}</option>`).join('');
+    entryMemberSelect.innerHTML = mOpts + `<option value="Others_Entry">Others</option>`;
+    reportSingleMember.innerHTML = mOpts;
+    monthSelect.innerHTML = repMonth.innerHTML = months.map(m=>`<option value="${m}">${m}</option>`).join('');
+}
+
+function generateNextId() {
+    if(!members.length) { mId.value = "01"; return; }
+    let ids = members.map(m => parseInt(m.id)).filter(n => !isNaN(n));
+    let next = (ids.length > 0 ? Math.max(...ids) + 1 : 1);
+    mId.value = next.toString().padStart(2, '0');
+}
+
+function addMember() {
+    if(!mName.value) return alert("নাম লিখুন!");
+    const file = mPhoto.files[0];
+    const saveToStore = (imgData) => {
+        let newMember = {
+            id: mId.value,
+            name: mName.value,
+            mobile: mMobile.value,
+            password: mPassword.value,
+            address: mAddress.value,
+            photo: imgData || ''
+        };
+        members.push(newMember);
+        localStorage.setItem('members', JSON.stringify(members)); // ব্রাউজারে সেভ
+        alert("সদস্য যুক্ত হয়েছে!");
+        mName.value = mMobile.value = mPassword.value = mAddress.value = mPhoto.value = "";
+        generateNextId();
+        loadMembers();
+        updateDropdowns();
+    };
+    if(file) { let r = new FileReader(); r.onload=(e)=>saveToStore(e.target.result); r.readAsDataURL(file); } 
+    else { saveToStore(''); }
+}
+
+function loadMembers() {
+    let h = `<table><tr><th>ছবি</th><th>ID</th><th>নাম</th><th>নম্বর</th><th>অ্যাড্রেস</th>`;
+    if(currentUser.isAdmin) h += `<th class="no-print">X</th>`;
+    h += `</tr>`;
+    // আইডি অনুযায়ী সাজানো
+    members.sort((a,b)=>a.id.localeCompare(b.id, undefined, {numeric: true})).forEach((m) => {
+        h += `<tr><td><img src="${m.photo || 'https://via.placeholder.com/35'}" class="p-thumb"></td><td>${m.id}</td><td><span class="name-link" onclick="viewProfile('${m.id}')">${m.name}</span></td><td>${m.mobile || '-'}</td><td>${m.address || '-'}</td>`;
+        if(currentUser.isAdmin) h += `<td class="no-print"><button class="del-btn" onclick="deleteMember('${m.id}')">Del</button></td>`;
+        h += `</tr>`;
+    });
+    memberList.innerHTML = h + `</table>`;
+}
+
+// প্রোফাইল এডিট ও অন্যান্য ফাংশন
+function saveEdit() {
+    const file = edPhoto.files[0];
+    const updateStore = (imgData) => {
+        if(window.editingOriginalId === 'admin') {
+            adminData.name=edName.value; adminData.mobile=edMobile.value; adminData.address=edAddress.value; adminData.password=edPass.value;
+            if(imgData) adminData.photo=imgData; localStorage.setItem('adminData', JSON.stringify(adminData));
+        } else {
+            let idx = members.findIndex(m=>m.id===window.editingOriginalId);
+            let newId = edId.value;
+            if(newId !== window.editingOriginalId) {
+                txns.forEach(t => { if(t.id === window.editingOriginalId) t.id = newId; });
+                localStorage.setItem('txn', JSON.stringify(txns));
+            }
+            members[idx] = {id:newId, name:edName.value, mobile:edMobile.value, address:edAddress.value, password:edPass.value, photo:imgData || members[idx].photo};
+            localStorage.setItem('members', JSON.stringify(members));
+        }
+        alert("আপডেট সফল!"); show('member'); updateDropdowns();
+    };
+    if(file) { let r = new FileReader(); r.onload=(e)=>updateStore(e.target.result); r.readAsDataURL(file); } 
+    else { updateStore(''); }
+}
+
+function show(s) {
+    document.querySelectorAll('.section').forEach(e=>e.classList.add('hidden'));
+    document.getElementById(s+'Section').classList.remove('hidden');
+    if(s==='member') { loadMembers(); if(currentUser && currentUser.isAdmin) generateNextId(); }
+    if(s==='history') loadHistory();
+}
+
+function addTransaction() { 
+    if(!amount.value) return alert("টাকা লিখুন!"); 
+    let selId = entryMemberSelect.value, selName = (selId === "Others_Entry") ? "Others" : entryMemberSelect.options[entryMemberSelect.selectedIndex].text; 
+    txns.push({id: selId, name: selName, cat: category.value, amt: parseFloat(amount.value), month: monthSelect.value, fy: fySelect.value}); 
+    localStorage.setItem('txn', JSON.stringify(txns)); 
+    alert("লেনদেন সেভ হয়েছে!"); 
+    amount.value = ''; 
+}
+
+function deleteMember(id) { if(confirm("সদস্য ডিলিট করবেন?")) { members = members.filter(m=>m.id!==id); localStorage.setItem('members',JSON.stringify(members)); loadMembers(); updateDropdowns(); }}
+function deleteTxn(i) { if(confirm("লেনদেন মুছবেন?")) { txns.splice(i,1); localStorage.setItem('txn',JSON.stringify(txns)); loadHistory(); }}
+function viewProfile(id) { let t = (id==='admin') ? adminData : members.find(x=>x.id===id); if(!t) return; profileDetails.innerHTML = `<img src="${t.photo || 'https://via.placeholder.com/100'}" class="p-large"><h2>${t.name}</h2><p>ID: ${t.id}</p><p>Mobile: ${t.mobile || '-'}</p><p>Address: ${t.address || '-'}</p>`; if(currentUser.isAdmin || t.id === currentUser.id) { modalActions.innerHTML = `<button onclick="closeModal(); openEditMode('${t.id}')" style="background:var(--edit); width:80%">Edit Profile</button>`; } else { modalActions.innerHTML = ''; } modalOverlay.style.display='flex'; }
+function closeModal() { modalOverlay.style.display='none'; }
+function openEditMode(id) { let t = (id === 'self') ? (currentUser.isAdmin ? adminData : members.find(m=>m.id === currentUser.id)) : (id === 'admin' ? adminData : members.find(m=>m.id === id)); if(!t) return; window.editingOriginalId = t.id; edId.value = t.id; edId.readOnly = !currentUser.isAdmin; edName.value = t.name; edMobile.value = t.mobile || ''; edAddress.value = t.address || ''; edPass.value = t.password; show('edit'); }
+function preparePrint(type) { let sub = ""; if(type === 'Report') { const t = reportType.value; if(t === 'month') sub = `Report: ${repMonth.value}, FY: ${repYear.value}`; else if(t === 'year') sub = `Yearly Report: ${repYear.value}`; else sub = `Summary Report (All Time)`; } else { sub = `All Member List`; } printSubTitle.innerText = sub; }
+function generateReport() { const type=reportType.value, mon=repMonth.value, yr=repYear.value, filter = reportMemberFilter.value; let filtered = txns.filter(t => (type==='summary' ? true : t.fy===yr) && (type==='month' ? t.month===mon : true)); if(!currentUser.isAdmin) filtered = filtered.filter(t => t.id === currentUser.id); else { if(filter === 'single') filtered = filtered.filter(t => t.id === reportSingleMember.value); else if(filter === 'all_members') filtered = filtered.filter(t => t.id !== 'Others_Entry'); else if(filter === 'others_only') filtered = filtered.filter(t => t.id === 'Others_Entry'); } let dataMap = {}; filtered.forEach(t => { if(!dataMap[t.id]) dataMap[t.id] = {name: t.name, d:0, f:0, fi:0, o:0}; if(t.cat==='Deposit') dataMap[t.id].d += t.amt; else if(t.cat==='Form Fee') dataMap[t.id].f += t.amt; else if(t.cat==='Fine') dataMap[t.id].fi += t.amt; else dataMap[t.id].o += t.amt; }); let h = `<table><tr><th>নাম</th><th>Deposit</th><th>Fee</th><th>Fine</th><th>Others</th><th>Total</th></tr>`, gD=0, gF=0, gFi=0, gO=0, gT=0; for(let id in dataMap) { let u = dataMap[id]; let tot = u.d+u.f+u.fi+u.o; h += `<tr><td>${u.name}</td><td>${u.d}</td><td>${u.f}</td><td>${u.fi}</td><td>${u.o}</td><td>${tot}</td></tr>`; gD+=u.d; gF+=u.f; gFi+=u.fi; gO+=u.o; gT+=tot; } reportOutput.innerHTML = h + `<tr class="grand-total"><td>GRAND TOTAL</td><td>${gD}</td><td>${gF}</td><td>${gFi}</td><td>${gO}</td><td>${gT}</td></tr></table>`; reportArea.classList.remove('hidden'); }
+function loadHistory() { let h = `<table><tr><th>ID</th><th>নাম</th><th>Dep</th><th>Fee</th><th>Fine</th><th>Oth</th><th>Total</th><th class="no-print">X</th></tr>`; txns.slice().reverse().forEach((t, i) => { let ri = txns.length - 1 - i; let d=t.cat==='Deposit'?t.amt:0, f=t.cat==='Form Fee'?t.amt:0, fi=t.cat==='Fine'?t.amt:0, o=t.cat==='Others'?t.amt:0; h += `<tr><td>${t.id==='Others_Entry'?'-':t.id}</td><td>${t.name}</td><td>${d}</td><td>${f}</td><td>${fi}</td><td>${o}</td><td>${t.amt}</td><td class="no-print"><button class="del-btn" onclick="deleteTxn(${ri})">Remove</button></td></tr>`; }); historyList.innerHTML = h + `</table>`; }
+function toggleFilters() { repMonth.style.display = reportType.value==='month'?'block':'none'; repYear.style.display = reportType.value==='summary'?'none':'block'; }
+function updateReportSubFilter() { reportSingleMember.classList.toggle('hidden', reportMemberFilter.value !== 'single'); }
+</script>
+</body>
+</html>
